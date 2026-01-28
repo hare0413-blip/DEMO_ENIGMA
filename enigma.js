@@ -25,12 +25,12 @@ const R2 = "ぬをけやすそえみはにまよさつあらひこてちせな�
 const R3 = "りえさこふつもわてのあむへしゆにきほとんはよろぬいかたせけまみそらうちれおやなす゛゜";
 
 /***********************
- * リフレクタ（対称）
+ * リフレクタ（完全対称）
  ***********************/
 const REF = A.split("").reverse().join("");
 
 /***********************
- * 逆ローター
+ * 逆ローター生成
  ***********************/
 function invert(r) {
   const inv = Array(N);
@@ -47,13 +47,13 @@ const R3I = invert(R3);
 /***********************
  * ローター通過
  ***********************/
-function f(c, r, p) {
+function forward(c, r, p) {
   const i = (A.indexOf(c) + p) % N;
   const w = r[i];
   return A[(A.indexOf(w) - p + N) % N];
 }
 
-function b(c, rI, p) {
+function backward(c, rI, p) {
   const i = (A.indexOf(c) + p) % N;
   const w = rI[i];
   return A[(A.indexOf(w) - p + N) % N];
@@ -66,19 +66,19 @@ function encChar(c, p1, p2, p3) {
   if (!A.includes(c)) return c;
 
   let x = c;
-  x = f(x, R1, p1);
-  x = f(x, R2, p2);
-  x = f(x, R3, p3);
+  x = forward(x, R1, p1);
+  x = forward(x, R2, p2);
+  x = forward(x, R3, p3);
   x = REF[A.indexOf(x)];
-  x = b(x, R3I, p3);
-  x = b(x, R2I, p2);
-  x = b(x, R1I, p1);
+  x = backward(x, R3I, p3);
+  x = backward(x, R2I, p2);
+  x = backward(x, R1I, p1);
   return x;
 }
 
 /***********************
- * 正規化
- *（分解のみ・必ず可逆）
+ * 正規化（濁点・半濁点のみ）
+ * ※ 拗音は扱わない
  ***********************/
 function normalizeJapanese(text) {
   return text
@@ -93,22 +93,13 @@ function normalizeJapanese(text) {
     .replace(/べ/g, "へ゛").replace(/ぼ/g, "ほ゛")
     // 半濁点
     .replace(/ぱ/g, "は゜").replace(/ぴ/g, "ひ゜").replace(/ぷ/g, "ふ゜")
-    .replace(/ぺ/g, "へ゜").replace(/ぽ/g, "ほ゜")
-    // 拗音（分解）
-    .replace(/きゃ/g, "きや").replace(/きゅ/g, "きゆ").replace(/きょ/g, "きよ")
-    .replace(/しゃ/g, "しや").replace(/しゅ/g, "しゆ").replace(/しょ/g, "しよ")
-    .replace(/ちゃ/g, "ちや").replace(/ちゅ/g, "ちゆ").replace(/ちょ/g, "ちよ")
-    .replace(/にゃ/g, "にや").replace(/にゅ/g, "にゆ").replace(/にょ/g, "によ")
-    .replace(/ひゃ/g, "ひや").replace(/ひゅ/g, "ひゆ").replace(/ひょ/g, "ひよ")
-    .replace(/みゃ/g, "みや").replace(/みゅ/g, "みゆ").replace(/みょ/g, "みよ")
-    .replace(/りゃ/g, "りや").replace(/りゅ/g, "りゆ").replace(/りょ/g, "りよ");
+    .replace(/ぺ/g, "へ゜").replace(/ぽ/g, "ほ゜");
 }
 
 /***********************
- * 再合成
- *（濁点・半濁点のみ）
+ * 表示用（濁点・半濁点のみ復元）
  ***********************/
-function denormalizeJapanese(text) {
+function displayJapanese(text) {
   return text
     .replace(/か゛/g, "が").replace(/き゛/g, "ぎ").replace(/く゛/g, "ぐ")
     .replace(/け゛/g, "げ").replace(/こ゛/g, "ご")
@@ -128,8 +119,8 @@ function denormalizeJapanese(text) {
 function runEnigma() {
   const raw = document.getElementById("inputText").value;
 
-  // ① 正規化
-  const normalized = normalizeJapanese(raw);
+  // ① 正規化（内部用）
+  const text = normalizeJapanese(raw);
 
   let p1 = A.indexOf(document.getElementById("pos1").value);
   let p2 = A.indexOf(document.getElementById("pos2").value);
@@ -139,9 +130,9 @@ function runEnigma() {
   if (p2 < 0) p2 = 0;
   if (p3 < 0) p3 = 0;
 
-  // ② Enigma（正規化文字列でのみ往復）
+  // ② Enigma
   let cipher = "";
-  for (const c of normalized) {
+  for (const c of text) {
     cipher += encChar(c, p1, p2, p3);
     if (A.includes(c)) {
       p1 = (p1 + 1) % N;
@@ -150,8 +141,8 @@ function runEnigma() {
     }
   }
 
-  // ③ 表示
+  // ③ 出力
   document.getElementById("normalized").textContent = cipher;
   document.getElementById("output").textContent =
-    denormalizeJapanese(cipher);
+    displayJapanese(cipher);
 }
