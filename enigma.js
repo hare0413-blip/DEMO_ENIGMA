@@ -1,5 +1,5 @@
 /***********************
- * 文字集合（48文字）
+ * 文字集合
  * 清音46 + 濁点 + 半濁点
  ***********************/
 const A =
@@ -18,14 +18,14 @@ const A =
 const N = A.length;
 
 /***********************
- * ひらがなローター
+ * ローター
  ***********************/
 const R1 = "そてまひらけこあよつにをほもさぬむえなうりちれゆいのふせろやはきかすわとん゛゜";
 const R2 = "ぬをけやすそえみはにまよさつあらひこてちせなうとほりのんもむきふいれゆかろわしへたお゛゜";
 const R3 = "りえさこふつもわてのあむへしゆにきほとんはよろぬいかたせけまみそらうちれおやなす゛゜";
 
 /***********************
- * リフレクタ（対称）
+ * リフレクタ（完全対称）
  ***********************/
 const REF = A.split("").reverse().join("");
 
@@ -77,7 +77,8 @@ function encChar(c, p1, p2, p3) {
 }
 
 /***********************
- * 正規化（濁点・半濁点・拗音）
+ * 正規化
+ * 濁点・半濁点・拗音はすべて分解
  ***********************/
 function normalizeJapanese(text) {
   return text
@@ -93,7 +94,7 @@ function normalizeJapanese(text) {
     // 半濁点
     .replace(/ぱ/g, "は゜").replace(/ぴ/g, "ひ゜").replace(/ぷ/g, "ふ゜")
     .replace(/ぺ/g, "へ゜").replace(/ぽ/g, "ほ゜")
-    // 拗音（★重要：必ず分解）
+    // 拗音（必ず分解・再合成しない）
     .replace(/きゃ/g, "きや").replace(/きゅ/g, "きゆ").replace(/きょ/g, "きよ")
     .replace(/しゃ/g, "しや").replace(/しゅ/g, "しゆ").replace(/しょ/g, "しよ")
     .replace(/ちゃ/g, "ちや").replace(/ちゅ/g, "ちゆ").replace(/ちょ/g, "ちよ")
@@ -103,9 +104,10 @@ function normalizeJapanese(text) {
     .replace(/りゃ/g, "りや").replace(/りゅ/g, "りゆ").replace(/りょ/g, "りよ");
 }
 
-
 /***********************
  * 再合成
+ * ※ 濁点・半濁点のみ復元
+ * ※ 拗音は復元しない（対称性保持）
  ***********************/
 function denormalizeJapanese(text) {
   return text
@@ -118,14 +120,7 @@ function denormalizeJapanese(text) {
     .replace(/は゛/g, "ば").replace(/ひ゛/g, "び").replace(/ふ゛/g, "ぶ")
     .replace(/へ゛/g, "べ").replace(/ほ゛/g, "ぼ")
     .replace(/は゜/g, "ぱ").replace(/ひ゜/g, "ぴ").replace(/ふ゜/g, "ぷ")
-    .replace(/へ゜/g, "ぺ").replace(/ほ゜/g, "ぽ")
-    // 拗音復元
-    .replace(/しや/g, "しゃ").replace(/しゆ/g, "しゅ").replace(/しよ/g, "しょ")
-    .replace(/ちや/g, "ちゃ").replace(/ちゆ/g, "ちゅ").replace(/ちよ/g, "ちょ")
-    .replace(/にや/g, "にゃ").replace(/にゆ/g, "にゅ").replace(/によ/g, "にょ")
-    .replace(/ひや/g, "ひゃ").replace(/ひゆ/g, "ひゅ").replace(/ひよ/g, "ひょ")
-    .replace(/みや/g, "みゃ").replace(/みゆ/g, "みゅ").replace(/みよ/g, "みょ")
-    .replace(/りや/g, "りゃ").replace(/りゆ/g, "りゅ").replace(/りよ/g, "りょ");
+    .replace(/へ゜/g, "ぺ").replace(/ほ゜/g, "ぽ");
 }
 
 /***********************
