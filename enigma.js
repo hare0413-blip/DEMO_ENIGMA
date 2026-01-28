@@ -1,6 +1,5 @@
 /***********************
- * 文字集合
- * 清音46 + 濁点 + 半濁点
+ * 文字集合（清音46）
  ***********************/
 const A =
   "あいうえお" +
@@ -12,17 +11,16 @@ const A =
   "まみむめも" +
   "やゆよ" +
   "らりるれろ" +
-  "わをん" +
-  "゛゜";
+  "わをん";
 
-const N = A.length;
+const N = A.length; // 46
 
 /***********************
- * ローター
+ * ローター（46文字対応）
  ***********************/
-const R1 = "そてまひらけこあよつにをほもさぬむえなうりちれゆいのふせろやはきかすわとん゛゜";
-const R2 = "ぬをけやすそえみはにまよさつあらひこてちせなうとほりのんもむきふいれゆかろわしへたお゛゜";
-const R3 = "りえさこふつもわてのあむへしゆにきほとんはよろぬいかたせけまみそらうちれおやなす゛゜";
+const R1 = "そてまひらけこあよつにをほもさぬむえなうりちれゆいのふせろやはきかすわとん";
+const R2 = "ぬをけやすそえみはにまよさつあらひこてちせなうとほりのんもむきふいれゆかろわしへたお";
+const R3 = "りえさこふつもわてのあむへしゆにきほとんはよろぬいかたせけまみそらうちれおやなす";
 
 /***********************
  * リフレクタ（完全対称）
@@ -63,7 +61,7 @@ function backward(c, rI, p) {
  * 1文字 Enigma
  ***********************/
 function encChar(c, p1, p2, p3) {
-  if (!A.includes(c)) return c;
+  if (!A.includes(c)) return c; // 記号・スペースは通す
 
   let x = c;
   x = forward(x, R1, p1);
@@ -77,50 +75,10 @@ function encChar(c, p1, p2, p3) {
 }
 
 /***********************
- * 正規化（濁点・半濁点のみ）
- * ※ 拗音は扱わない
- ***********************/
-function normalizeJapanese(text) {
-  return text
-    // 濁点
-    .replace(/が/g, "か゛").replace(/ぎ/g, "き゛").replace(/ぐ/g, "く゛")
-    .replace(/げ/g, "け゛").replace(/ご/g, "こ゛")
-    .replace(/ざ/g, "さ゛").replace(/じ/g, "し゛").replace(/ず/g, "す゛")
-    .replace(/ぜ/g, "せ゛").replace(/ぞ/g, "そ゛")
-    .replace(/だ/g, "た゛").replace(/ぢ/g, "ち゛").replace(/づ/g, "つ゛")
-    .replace(/で/g, "て゛").replace(/ど/g, "と゛")
-    .replace(/ば/g, "は゛").replace(/び/g, "ひ゛").replace(/ぶ/g, "ふ゛")
-    .replace(/べ/g, "へ゛").replace(/ぼ/g, "ほ゛")
-    // 半濁点
-    .replace(/ぱ/g, "は゜").replace(/ぴ/g, "ひ゜").replace(/ぷ/g, "ふ゜")
-    .replace(/ぺ/g, "へ゜").replace(/ぽ/g, "ほ゜");
-}
-
-/***********************
- * 表示用（濁点・半濁点のみ復元）
- ***********************/
-function displayJapanese(text) {
-  return text
-    .replace(/か゛/g, "が").replace(/き゛/g, "ぎ").replace(/く゛/g, "ぐ")
-    .replace(/け゛/g, "げ").replace(/こ゛/g, "ご")
-    .replace(/さ゛/g, "ざ").replace(/し゛/g, "じ").replace(/す゛/g, "ず")
-    .replace(/せ゛/g, "ぜ").replace(/そ゛/g, "ぞ")
-    .replace(/た゛/g, "だ").replace(/ち゛/g, "ぢ").replace(/つ゛/g, "づ")
-    .replace(/て゛/g, "で").replace(/と゛/g, "ど")
-    .replace(/は゛/g, "ば").replace(/ひ゛/g, "び").replace(/ふ゛/g, "ぶ")
-    .replace(/へ゛/g, "べ").replace(/ほ゛/g, "ぼ")
-    .replace(/は゜/g, "ぱ").replace(/ひ゜/g, "ぴ").replace(/ふ゜/g, "ぷ")
-    .replace(/へ゜/g, "ぺ").replace(/ほ゜/g, "ぽ");
-}
-
-/***********************
  * 実行
  ***********************/
 function runEnigma() {
-  const raw = document.getElementById("inputText").value;
-
-  // ① 正規化（内部用）
-  const text = normalizeJapanese(raw);
+  const text = document.getElementById("inputText").value;
 
   let p1 = A.indexOf(document.getElementById("pos1").value);
   let p2 = A.indexOf(document.getElementById("pos2").value);
@@ -130,10 +88,10 @@ function runEnigma() {
   if (p2 < 0) p2 = 0;
   if (p3 < 0) p3 = 0;
 
-  // ② Enigma
-  let cipher = "";
+  let out = "";
   for (const c of text) {
-    cipher += encChar(c, p1, p2, p3);
+    out += encChar(c, p1, p2, p3);
+
     if (A.includes(c)) {
       p1 = (p1 + 1) % N;
       if (p1 === 0) p2 = (p2 + 1) % N;
@@ -141,8 +99,5 @@ function runEnigma() {
     }
   }
 
-  // ③ 出力
-  document.getElementById("normalized").textContent = cipher;
-  document.getElementById("output").textContent =
-    displayJapanese(cipher);
+  document.getElementById("output").textContent = out;
 }
