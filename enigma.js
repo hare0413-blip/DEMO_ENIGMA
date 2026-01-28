@@ -93,8 +93,8 @@ function normalizeJapanese(text) {
     // 半濁点
     .replace(/ぱ/g, "は゜").replace(/ぴ/g, "ひ゜").replace(/ぷ/g, "ふ゜")
     .replace(/ぺ/g, "へ゜").replace(/ぽ/g, "ほ゜")
-    // 拗音
-    .replace(/きゃ/g, "きゃ").replace(/きゅ/g, "きゅ").replace(/きょ/g, "きょ")
+    // 拗音（★重要：必ず分解）
+    .replace(/きゃ/g, "きや").replace(/きゅ/g, "きゆ").replace(/きょ/g, "きよ")
     .replace(/しゃ/g, "しや").replace(/しゅ/g, "しゆ").replace(/しょ/g, "しよ")
     .replace(/ちゃ/g, "ちや").replace(/ちゅ/g, "ちゆ").replace(/ちょ/g, "ちよ")
     .replace(/にゃ/g, "にや").replace(/にゅ/g, "にゆ").replace(/にょ/g, "によ")
@@ -102,6 +102,7 @@ function normalizeJapanese(text) {
     .replace(/みゃ/g, "みや").replace(/みゅ/g, "みゆ").replace(/みょ/g, "みよ")
     .replace(/りゃ/g, "りや").replace(/りゅ/g, "りゆ").replace(/りょ/g, "りよ");
 }
+
 
 /***********************
  * 再合成
