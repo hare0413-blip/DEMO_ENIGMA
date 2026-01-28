@@ -151,7 +151,7 @@ function runEnigma() {
   }
 
   // ③ 表示
-  document.getElementById("normalizedOutput").textContent = cipher;
+  document.getElementById("normalized").textContent = cipher;
   document.getElementById("output").textContent =
     denormalizeJapanese(cipher);
 }
