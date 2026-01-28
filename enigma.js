@@ -25,12 +25,12 @@ const R2 = "ぬをけやすそえみはにまよさつあらひこてちせな�
 const R3 = "りえさこふつもわてのあむへしゆにきほとんはよろぬいかたせけまみそらうちれおやなす゛゜";
 
 /***********************
- * リフレクタ（完全対称）
+ * リフレクタ（対称）
  ***********************/
 const REF = A.split("").reverse().join("");
 
 /***********************
- * 逆ローター生成
+ * 逆ローター
  ***********************/
 function invert(r) {
   const inv = Array(N);
@@ -60,7 +60,7 @@ function b(c, rI, p) {
 }
 
 /***********************
- * 1文字暗号化
+ * 1文字 Enigma
  ***********************/
 function encChar(c, p1, p2, p3) {
   if (!A.includes(c)) return c;
@@ -78,7 +78,7 @@ function encChar(c, p1, p2, p3) {
 
 /***********************
  * 正規化
- * 濁点・半濁点・拗音はすべて分解
+ *（分解のみ・必ず可逆）
  ***********************/
 function normalizeJapanese(text) {
   return text
@@ -94,7 +94,7 @@ function normalizeJapanese(text) {
     // 半濁点
     .replace(/ぱ/g, "は゜").replace(/ぴ/g, "ひ゜").replace(/ぷ/g, "ふ゜")
     .replace(/ぺ/g, "へ゜").replace(/ぽ/g, "ほ゜")
-    // 拗音（必ず分解・再合成しない）
+    // 拗音（分解）
     .replace(/きゃ/g, "きや").replace(/きゅ/g, "きゆ").replace(/きょ/g, "きよ")
     .replace(/しゃ/g, "しや").replace(/しゅ/g, "しゆ").replace(/しょ/g, "しよ")
     .replace(/ちゃ/g, "ちや").replace(/ちゅ/g, "ちゆ").replace(/ちょ/g, "ちよ")
@@ -106,8 +106,7 @@ function normalizeJapanese(text) {
 
 /***********************
  * 再合成
- * ※ 濁点・半濁点のみ復元
- * ※ 拗音は復元しない（対称性保持）
+ *（濁点・半濁点のみ）
  ***********************/
 function denormalizeJapanese(text) {
   return text
@@ -128,7 +127,9 @@ function denormalizeJapanese(text) {
  ***********************/
 function runEnigma() {
   const raw = document.getElementById("inputText").value;
-  const text = normalizeJapanese(raw);
+
+  // ① 正規化
+  const normalized = normalizeJapanese(raw);
 
   let p1 = A.indexOf(document.getElementById("pos1").value);
   let p2 = A.indexOf(document.getElementById("pos2").value);
@@ -138,9 +139,10 @@ function runEnigma() {
   if (p2 < 0) p2 = 0;
   if (p3 < 0) p3 = 0;
 
-  let out = "";
-  for (const c of text) {
-    out += encChar(c, p1, p2, p3);
+  // ② Enigma（正規化文字列でのみ往復）
+  let cipher = "";
+  for (const c of normalized) {
+    cipher += encChar(c, p1, p2, p3);
     if (A.includes(c)) {
       p1 = (p1 + 1) % N;
       if (p1 === 0) p2 = (p2 + 1) % N;
@@ -148,6 +150,8 @@ function runEnigma() {
     }
   }
 
+  // ③ 表示
+  document.getElementById("normalizedOutput").textContent = cipher;
   document.getElementById("output").textContent =
-    denormalizeJapanese(out);
+    denormalizeJapanese(cipher);
 }
