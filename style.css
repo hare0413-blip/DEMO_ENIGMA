@@ -42,7 +42,7 @@ input {
   width: 100%;
   padding: 8px;
   background: #0c0e10;
-  color: #e0e0e0;
+  color: #DB7093;
   border: 1px solid #555;
   font-family: inherit;
 }
@@ -61,7 +61,7 @@ button {
   width: 100%;
   padding: 10px;
   background: #2a2e33;
-  color: #e0e0e0;
+  color: #FFB6C1;
   border: 1px solid #777;
   cursor: pointer;
   letter-spacing: 1px;
